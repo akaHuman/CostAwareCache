@@ -15,7 +15,7 @@ public class CostAwareCache<K, V> {
     private final AugmentedMinHeap<K> keyIndex;
     private int capacity;
 
-    private static final int MIN_CAPACITY = 1 << 4;
+    private static final int MIN_CAPACITY = 1 << 1;
     private static final int MAX_CAPACITY = 1 << 30;
 
     public CostAwareCache(int initCapacity) {
@@ -45,5 +45,15 @@ public class CostAwareCache<K, V> {
             cache.put(key, value);
             keyIndex.insert(key, lValue + cost);
         }
+    }
+
+    public V get(K key) {
+        V value = null;
+        if(key != null && cache.containsKey(key)) {
+            value = cache.get(key);
+            int currentHValue = keyIndex.get(keyIndex.getKeyIndex(key)).getHValue();
+            keyIndex.updateHValue(key, lValue + currentHValue);
+        }
+        return value;
     }
 }
